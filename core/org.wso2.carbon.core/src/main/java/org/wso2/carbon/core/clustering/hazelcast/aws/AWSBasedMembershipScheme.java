@@ -94,63 +94,28 @@ public class AWSBasedMembershipScheme implements HazelcastMembershipScheme {
 
     @Override
     public void init() throws ClusteringFault {
+
+        nwConfig.getInterfaces().setEnabled(true).addInterface("172.31.0.0");
         nwConfig.getJoin().getMulticastConfig().setEnabled(false);
-        nwConfig.getJoin().getTcpIpConfig().setEnabled(false);
+
         AwsConfig awsConfig = nwConfig.getJoin().getAwsConfig();
         awsConfig.setEnabled(true);
 
-        Parameter accessKey = getParameter(AWSConstants.ACCESS_KEY);
-        Parameter secretKey = getParameter(AWSConstants.SECRET_KEY);
-        Parameter iamRole = getParameter(AWSConstants.IAM_ROLE);
-        Parameter securityGroup = getParameter(AWSConstants.SECURITY_GROUP);
-        Parameter connTimeout = getParameter(AWSConstants.CONNECTION_TIMEOUT);
-        Parameter hostHeader = getParameter(AWSConstants.HOST_HEADER);
         Parameter region = getParameter(AWSConstants.REGION);
         Parameter tagKey = getParameter(AWSConstants.TAG_KEY);
         Parameter tagValue = getParameter(AWSConstants.TAG_VALUE);
 
-        SecretResolver secretResolver = getAxis2SecretResolver();
-
-        if (accessKey != null) {
-            if (secretResolver != null) {
-                String resolvedValue = MiscellaneousUtil.resolve(accessKey.getParameterElement(), secretResolver);
-                if (!StringUtils.isEmpty(resolvedValue)) {
-                    awsConfig.setAccessKey(resolvedValue);
-                }
-            } else {
-                awsConfig.setAccessKey(((String) accessKey.getValue()).trim());
-            }
-        }
-        if (secretKey != null) {
-            if (secretResolver != null) {
-                String resolvedValue = MiscellaneousUtil.resolve(secretKey.getParameterElement(), secretResolver);
-                if (!StringUtils.isEmpty(resolvedValue)) {
-                    awsConfig.setSecretKey(resolvedValue);
-                }
-            } else {
-                awsConfig.setSecretKey(((String) secretKey.getValue()).trim());
-            }
-        }
-        if (iamRole != null) {
-            awsConfig.setIamRole(((String) iamRole.getValue()).trim());
-        }
-        if (securityGroup != null) {
-            awsConfig.setSecurityGroupName(((String) securityGroup.getValue()).trim());
-        }
-        if (connTimeout != null) {
-            awsConfig.setConnectionTimeoutSeconds(Integer.parseInt(((String) connTimeout.getValue()).trim()));
-        }
-        if (hostHeader != null) {
-            awsConfig.setHostHeader(((String) hostHeader.getValue()).trim());
-        }
         if (region != null) {
             awsConfig.setRegion(((String) region.getValue()).trim());
+            log.info("region :" + (String) region.getValue());
         }
         if (tagKey != null) {
             awsConfig.setTagKey(((String) tagKey.getValue()).trim());
+            log.info("tagKey :" + (String) tagKey.getValue());
         }
         if (tagValue != null) {
             awsConfig.setTagValue(((String) tagValue.getValue()).trim());
+            log.info("tagValue :" + (String) tagValue.getValue());
         }
 
     }
